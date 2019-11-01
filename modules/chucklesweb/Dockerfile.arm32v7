@@ -1,0 +1,27 @@
+FROM resin/raspberrypi3-debian:stretch
+
+WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libboost-python1.62.0 python3-pip libpython3-dev && \
+    rm -rf /var/lib/apt/lists/* 
+
+RUN pip3 install --upgrade pip 
+RUN pip install --upgrade setuptools 
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
+
+RUN apt-get update && apt-get -y install mpg321
+
+COPY . .
+
+COPY templates templates
+COPY sounds sounds
+COPY chuckles-sounds.py chuckles-sounds.py
+COPY chuckles-smoke.py chuckles-smoke.py
+
+#RUN useradd -ms /bin/bash moduleuser
+#USER root
+
+EXPOSE 8000
+ENTRYPOINT [ "python3", "-u", "./main2.py" ]
